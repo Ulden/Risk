@@ -1,0 +1,145 @@
+{% extends 'blocks/layout.html' %} {% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <ul class="nav nav-pills" id="myTab">
+                <li role="presentation" class="active"><a href="#Road" data-toggle="tab">Road</a></li>
+                <li role="presentation"><a href="#POI" data-toggle="tab">POI</a></li>
+            </ul>
+            <div class="tab-content" id="MyTabContent">
+                <div class="tab-pane fade in active" id="Road">
+                    <form action="{% url 'update_weights' %}" method="post">
+                        <div class="table-responsive">
+                            {% csrf_token %}
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        {% for tag in road_tags %}
+                                        <th>{{ tag }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for f_tag in road_tags %}
+                                    <tr>
+                                        <th scope="row">{{ f_tag }}</th>
+                                        {% for b_tag in road_tags %}
+                                        <td>
+                                            <label for={{ f_tag }}_{{ b_tag }}>
+                                                        <select class="form-control"
+                                                                name={{ f_tag }}_{{ b_tag }}
+                                                                required>
+                                                            <option>0</option>
+                                                            <option>-1</option>
+                                                            <option>1</option>
+                                                        </select>
+                                                    </label>
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="submit" class="btn btn-default" value="SUBMIT" />
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="POI">
+                    <form action="{% url 'update_weights' %}" method="post">
+                        <div class="table-responsive">
+                            {% csrf_token %}
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        {% for tag in poi_tags %}
+                                        <th>{{ tag }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for f_tag in poi_tags %}
+                                    <tr>
+                                        <th scope="row">{{ f_tag }}</th>
+                                        {% for b_tag in poi_tags %}
+                                        <td>
+                                            <label for={{ f_tag }}_{{ b_tag }}>
+                                                        <select class="form-control"
+                                                                name={{ f_tag }}_{{ b_tag }}
+                                                                required>
+                                                            <option>0</option>
+                                                            <option>-1</option>
+                                                            <option>1</option>
+                                                        </select>
+                                                    </label>
+
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="submit" class="btn btn-default" value="SUBMIT" />
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="embed-responsive embed-responsive-4by3">
+                <div class="embed-responsive-item" id="weights"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% load static %}
+
+<script src="{% static 'echarts/echarts.js' %}"></script>
+<script src="{% static 'echarts/Theme/roma.js' %}"></script>
+<script src="{% static 'echarts/Map/tianjin.js' %}"></script>
+<script src="{% static 'echarts/bmap.js' %}"></script>
+<script src="http://api.map.baidu.com/api?v=2.0&ak=ujNWPHAcmHNLOKD4XwWw0RjoC8V5prnM" type="text/javascript"></script>
+
+<script type="text/javascript">
+    var chart = echarts.init(document.getElementById('weights'), 'dark');
+    var option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend:{
+            data:['a','b']
+        },
+        animationType: 'scale',
+        animationEasing: 'elasticOut',
+        calculable : true,
+        series: [{
+            name:'a',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '50%'],
+            roseType: 'radius',
+            data: []
+        },{
+            name:'b',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '50%'],
+            roseType: 'radius',
+            data: []
+        }]
+    };
+    chart.setOption(option);
+    chart.showLoading();
+
+    $.get("{% url 'get_weights' %}").done(function (resourse) {
+        chart.hideLoading();
+        option.series[0].data = resourse[1];
+        option.series[1].data = resourse[0];
+        chart.setOption(option);
+    })
+</script>
+{% endblock content %}

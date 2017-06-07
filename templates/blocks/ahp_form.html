@@ -1,0 +1,136 @@
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-pills" id="myTab">
+            <li role="presentation" class="active"><a href="#Road" data-toggle="tab">Road</a></li>
+{#            <li role="presentation"><a href="#Vehicle" data-toggle="tab">Vehicle</a></li>#}
+            <li role="presentation"><a href="#POI" data-toggle="tab">POI</a></li>
+        </ul>
+        <div class="tab-content" id="MyTabContent">
+            <div class="tab-pane fade in active" id="Road">
+                <form action="{% url 'weights' %}" method="post">
+                    <div class="table-responsive">
+                        {% csrf_token %}
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                {% for tag in road_tags %}
+                                    <th>{{ tag }}</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for f_tag in road_tags %}
+                                <tr>
+                                    <th scope="row">{{ f_tag }}</th>
+                                    {% for b_tag in road_tags %}
+                                        <td>
+                                            <label for={{ f_tag }}_{{ b_tag }}>
+                                                <select class="form-control"
+                                                        name={{ f_tag }}_{{ b_tag }}
+                                                        required>
+                                                    <option>0</option>
+                                                    <option>-1</option>
+                                                    <option>1</option>
+                                                </select>
+                                            </label>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <input type="submit" class="btn btn-default" value="SUBMIT"/>
+                </form>
+            </div>
+{#            <div class="tab-pane fade" id="Vehicle">#}
+{#                <form action="{% url 'weights' %}" method="post">#}
+{#                    <div class="table-responsive">#}
+{#                        {% csrf_token %}#}
+{#                        <table class="table table-bordered">#}
+{#                            <thead>#}
+{#                            <tr>#}
+{#                                <th>#</th>#}
+{#                                {% for tag in vehicle_tags %}#}
+{#                                    <th>{{ tag }}</th>#}
+{#                                {% endfor %}#}
+{#                            </tr>#}
+{#                            </thead>#}
+{#                            <tbody>#}
+{#                            {% for f_tag in vehicle_tags %}#}
+{#                                <tr>#}
+{#                                    <th scope="row">{{ f_tag }}</th>#}
+{#                                    {% for b_tag in vehicle_tags %}#}
+{#                                        <td>#}
+{#                                            <label for={{ f_tag }}_{{ b_tag }}>#}
+{#                                                <select class="form-control"#}
+{#                                                        name={{ f_tag }}_{{ b_tag }}#}
+{#                                                        required>#}
+{#                                                    <option>0</option>#}
+{#                                                    <option>-1</option>#}
+{#                                                    <option>1</option>#}
+{#                                                </select>#}
+{#                                            </label>#}
+{#                                        </td>#}
+{#                                    {% endfor %}#}
+{#                                </tr>#}
+{#                            {% endfor %}#}
+{#                            </tbody>#}
+{#                        </table>#}
+{#                    </div>#}
+{#                    <input type="submit" class="btn btn-default" value="SUBMIT"/>#}
+{#                </form>#}
+{#            </div>#}
+            <div class="tab-pane fade" id="POI">
+                <form action="{% url 'weights' %}" method="post">
+                    <div class="table-responsive">
+                        {% csrf_token %}
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                {% for tag in poi_tags %}
+                                    <th>{{ tag }}</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for f_tag in poi_tags %}
+                                <tr>
+                                    <th scope="row">{{ f_tag }}</th>
+                                    {% for b_tag in poi_tags %}
+                                        <td>
+                                            <label for={{ f_tag }}_{{ b_tag }}>
+                                                <select class="form-control"
+                                                        name={{ f_tag }}_{{ b_tag }}
+                                                        required>
+                                                    <option>0</option>
+                                                    <option>-1</option>
+                                                    <option>1</option>
+                                                </select>
+                                            </label>
+
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <input type="submit" class="btn btn-default" value="SUBMIT"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{#<div class="row">#}
+{#    <div class="col-md-12">#}
+{#        <form id="calculate_result" method="post" action="{% url 'caculate' %}">{% csrf_token %}</form>#}
+{#        <form id="calculate_weight" method="post" action="{% url 'caculate_weight' %}">{% csrf_token %}</form>#}
+{#        <div class="btn-group">#}
+{#            <input type="submit" class="btn btn-danger" value="Calculate Result" form="calculate_result">#}
+{#            <input type="submit" class="btn btn-danger" value="Calculate Weight" form="calculate_weight">#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}

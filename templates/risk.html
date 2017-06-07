@@ -1,0 +1,193 @@
+{% extends 'blocks/layout.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <div class="embed-responsive-item" id="main"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="embed-responsive embed-responsive-4by3">
+                            <div class="embed-responsive-item" id="detail"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <form method="post">
+                            {% csrf_token %}
+                            <label for = "date">
+                                <select class="form-control" name="date" required>
+                                    <option>04-01</option>
+                                    <option>04-02</option>
+                                    <option>04-03</option>
+                                    <option>04-04</option>
+                                    <option>04-05</option>
+                                    <option>04-06</option>
+                                    <option>04-07</option>
+                                    <option>04-08</option>
+                                    <option>04-09</option>
+                                    <option>05-07</option>
+                                </select>
+                            </label>
+
+                            <label for = "time">
+                                <select class="form-control" name="time" required>
+                                    <option>00-02</option>
+                                    <option>02-04</option>
+                                    <option>04-06</option>
+                                    <option>06-08</option>
+                                    <option>08-10</option>
+                                    <option>10-12</option>
+                                    <option>12-14</option>
+                                    <option>14-16</option>
+                                    <option>16-18</option>
+                                    <option>18-20</option>
+                                    <option>20-22</option>
+                                    <option>22-00</option>
+                                </select>
+                            </label>
+                            <input type="submit" class="btn btn-default" value="SUBMIT"/>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% load static %}
+
+    <script src="{% static 'echarts/echarts.js' %}"></script>
+    <script src="{% static 'echarts/Theme/roma.js' %}"></script>
+    <script src="{% static 'echarts/Map/tianjin.js' %}"></script>
+    <script src="{% static 'echarts/bmap.js' %}"></script>
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=ujNWPHAcmHNLOKD4XwWw0RjoC8V5prnM"
+            type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var map_chart = echarts.init(document.getElementById('main'));
+        var detail_chart = echarts.init(document.getElementById('detail'));
+
+        var map_option = {
+            bmap: {
+                roam: true
+            },
+            visualMap: {
+                type: "piecewise",
+                left: 'right',
+                min: 0,
+                max: 10,
+                splitNumber: 6,
+                maxOpen: true,
+                color: ['red', 'yellow', 'green']
+            },
+            tooltip: {
+            formatter: function (params, ticket, callback) {
+                return params.value;
+            },
+            trigger: 'item'
+        },
+            series: [{
+                type: 'lines',
+                coordinateSystem: 'bmap',
+                polyline: true,
+                lineStyle: {
+                    normal: {
+                        opacity: 1,
+                        width: 4
+                    },
+                    emphasis: {
+                        width: 6
+                    }
+                },
+                effect: {
+                    show: true,
+                    symbolSize: 2,
+                    color: "white"
+                },
+                data: []
+            }]
+        };
+        var detail_option = {
+            radar: {
+                indicator: [
+                    {name: 'traffic sign', max: 20},
+                    {name: 'lane num', max: 20},
+                    {name: 'lane width', max: 20},
+                    {name: 'mixed traffic', max: 20},
+                    {name: 'speed limit', max: 20},
+                    {name: 'radius ', max: 20}
+                ],
+                shape: 'circle',
+                splitNumber: 5,
+                name: {
+                    textStyle: {color: '#377bb5'}
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: [
+                            'rgba(55,123,181, 0.1)', 'rgba(55,123,181, 0.2)',
+                            'rgba(55,123,181, 0.4)', 'rgba(55,123,181 0.6)',
+                            'rgba(55,123,181, 0.8)', 'rgba(55,123,181, 1)'
+                        ].reverse()
+                    }
+                },
+                splitArea: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: 'rgba(55,123,181, 0.5)'
+                    }
+                }
+            },
+            series: [{
+                type: 'radar',
+                data: [],
+                symbol: 'none',
+                itemStyle: {
+                    normal: {
+                        color: '#377bb5'
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        opacity: 0.05
+                    }
+                }
+            }]
+
+        };
+
+
+        map_chart.setOption(map_option);
+        detail_chart.setOption(detail_option);
+
+        map_chart.showLoading();
+        detail_chart.showLoading();
+
+        var map = map_chart.getModel().getComponent('bmap').getBMap();
+        map.centerAndZoom("天津");
+
+
+        $.get("{% url 'real_risk' %}").done(function (resource) {
+            map_chart.hideLoading();
+            detail_chart.hideLoading();
+            map_option.series[0].data = resource;
+            map_chart.setOption(map_option);
+
+            map_chart.on('click', function (params) {
+                if (params.seriesType == "lines") {
+                    $.get("data/attributes" + params.name, function (resource) {
+                        detail_option.series[0].data = resource;
+                        detail_chart.setOption(detail_option);
+                    })
+                }
+            });
+
+        });
+    </script>
+{% endblock content %}
